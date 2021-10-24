@@ -5,10 +5,10 @@ This library has been created to migrate our data from Jira 8.5.5 to Redmine 4.2
 Depending on complexity of your Jira configuration and desired quality of imported data
 it can be complicated and time consuming task with multuple tries.
 Don't expect it to be out of the box solution, you will need to adjust your Redmine configuration,
-the import configuration and possibly the source code.
+the import configuration and possibly the source code.  
 I hope, the library will give you a good starting point and allow you to adapt it to your needs.
 
-It is based on jira2redmine by Kassius Kress (https://github.com/hacpaka/jira2redmine)
+It is based on "jira2redmine" by Kassius Kress (https://github.com/hacpaka/jira2redmine)
 with number of improvements and extensions:
 
 - User account status (locked/unlocked) based on Jira active/inactive
@@ -59,27 +59,27 @@ with number of improvements and extensions:
 * [MariaDB] v10.3
 
 ### Configuration
-Plese review docummented config/config.yml.default file
+Plese review the docummented config/config.yml.default file.
 
 ## How to
-Obviously, you will need fresh working Redmine instance.
+Obviously, you will need fresh working Redmine instance.  
 (You can check my docker - https://gitlab.rk86.com/alex/redmine-docker)
 
-Add new statuses, trackers you want to map and import from Jira.
+Add new statuses, trackers you want to map and import from Jira.  
 Set new trackers as default for new projects in Administration / Settings / Projects
 
-Add new custom text fields you want to map an import from Jira.
+Add new custom text fields you want to map an import from Jira.  
 It is safer to enable them for all trackers.
 
-If you need cross-project relations - enable 'Allow cross-project issue relations'
+If you need cross-project relations - enable 'Allow cross-project issue relations'.  
 in Administration / Settings / Issue tracking.
 
 Enable Redmine REST web service in Administration / Settings/ API.
 
-As default Redmine has limit to maximum returned records for REST as 100.
+As default Redmine has limit to maximum returned records for REST as 100.  
 It could be the issue and we need temporarely remove this limitation.
 
-In case of my docker (adjust it for your case, should be similar):
+In case of my docker used:
 
 ```
 docker exec -it `docker ps | grep 'alex-redmine:01' | awk '{ print $1 }'` /bin/bash
@@ -99,7 +99,7 @@ touch /opt/bitnami/redmine/tmp/restart.txt
 ---
 Preparing the stage machine
 
-In my case, the import process was consuming around 12GB of RAM due size of Jira XML loaded.
+In my case, the import process was consuming around 12GB of RAM due size of Jira XML loaded.  
 For testing I was using my wokstations with Redmine running as a docker, and later re-run it on
 production environment (prod server + stage machine doing import).
 
@@ -113,7 +113,7 @@ cd redmine-jira-import
 
 ```
 
-Installing required gems with bundler
+Installing ruby and required gems with bundler
 
 for Ubuntu:
 
