@@ -56,7 +56,7 @@ namespace :jira do
               "INSERT INTO `issue_relations` (`issue_from_id`, `issue_to_id`, `relation_type`) VALUES (%s, %s, '%s');", data[:issue_from_id], data[:issue_to_id], data[:relation_type]
             ))
     end
-  
+
     private :store
   end
 end

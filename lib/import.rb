@@ -748,7 +748,12 @@ namespace :jira do
       ret
     end
 
-    # private :get_list_from_tag, :load_jira_types, :load_jira_priorities,
-    #        :load_jira_statuses, :load_jira_projects, :load_jira_issues, :load_jira_comments, :load_jira_worklogs
+    private :prepare_roles, :prepare_statuses, :prepare_trackers, :prepare_priorities, :prepare_customfields,
+            :migrate_users, :migrate_projects, :migrate_issues, :update_cross_project_relations,
+            :process_custom_fields, :load_jira_statuses, :load_jira_users, :load_jira_user_aliases,
+            :get_user_id, :load_jira_types, :load_jira_priorities, :load_jira_projects, :load_jira_project_versions,
+            :load_jira_issues, :load_jira_issue_links, :load_jira_comments, :load_jira_worklogs, :load_jira_attaches,
+            :load_jira_node_associations, :load_jira_history, :load_jira_customfields,
+            :load_jira_customfield_values, :get_list_from_tag
   end
 end
