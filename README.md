@@ -77,7 +77,7 @@ in Administration / Settings / Issue tracking.
 Enable Redmine REST web service in Administration / Settings/ API.
 
 As default Redmine has limit to maximum returned records for REST as 100.  
-It could be the issue and we need temporarely remove this limitation.
+It could cause issues and we need temporarily remove this limitation.
 
 In case of my docker used:
 
@@ -132,7 +132,7 @@ sudo pacman -S ruby ruby-irb
 
 Add to your shell profile since we want to use user installed gems:
 "
-export GEM_HOME="$(ruby -e 'puts Gem.user_dir')"
+export GEM_HOME="$(ruby -e 'puts Gem.user_dir')"  
 export PATH="$PATH:$GEM_HOME/bin"
 "
 Restart your terminal session.
