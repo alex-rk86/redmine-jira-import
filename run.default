@@ -1,0 +1,45 @@
+#!/bin/bash
+SQL_OUTPUT_FILE="/home/alex/JiraMigration/migrate.sql"
+FILES_OUTPUT_DIR="/home/alex/JiraMigration/jira"
+REDMINE_DOCKER_SQL_NAME="redmine-mariadb"
+REDMINE_DOCKER_FILES_DIR="/var/lib/docker/volumes/redmine_redmine_data/_data/redmine/files/jira"
+
+echo Cleaning old processing files...
+rm $SQL_OUTPUT_FILE
+rm $FILES_OUTPUT_DIR/*
+
+#rake import --trace
+rake import
+
+echo Post processing...
+
+# For local redmine docker
+read -p "Press enter to continue"
+if test -f "$SQL_OUTPUT_FILE"; then
+echo Updating sql...
+docker exec -i `docker ps | grep "$REDMINE_DOCKER_SQL_NAME" | awk '{ print $1 }'` sh -c  'exec mysql -u"$MARIADB_USER" -p"$MARIADB_PASSWORD" "$MARIADB_DATABASE"' < $SQL_OUTPUT_FILE
+echo Copying files...
+sudo -i <<EOF
+cp $FILES_OUTPUT_DIR/* $REDMINE_DOCKER_FILES_DIR
+find $REDMINE_DOCKER_FILES_DIR -type f -exec chmod 0644 {} \+ -exec chown 999:root {} \;
+EOF
+else
+echo Nothing to process...
+fi
+
+# For remote redmine server
+# read -p "Press enter to continue"
+# scp $SQL_OUTPUT_FILE user@example.com:/home/alex/JiraMigration
+# scp $FILES_OUTPUT_DIR/* user@example.com:/home/alex/JiraMigration/jira/
+
+# On redmine server
+# echo Updating sql...
+# docker exec -i `docker ps | grep "$REDMINE_DOCKER_SQL_NAME" | awk '{ print $1 }'` sh -c  'exec mysql -u"$MARIADB_USER" -p"$MARIADB_PASSWORD" "$MARIADB_DATABASE"' < $SQL_OUTPUT_FILE
+# echo Copying files...
+# sudo -i <<EOF
+# cp $FILES_OUTPUT_DIR/* $REDMINE_DOCKER_FILES_DIR
+# find $REDMINE_DOCKER_FILES_DIR -type f -exec chmod 0644 {} \+ -exec chown 999:root {} \;
+# echo Removing files...
+# rm $SQL_OUTPUT_FILE &&
+# rm $FILES_OUTPUT_DIR/*
+# EOF

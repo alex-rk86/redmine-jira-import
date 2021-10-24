@@ -1,0 +1,134 @@
+# Redmine URL
+REDMINE_URL: 'http://localhost'
+
+# Redmine REST API key
+REDMINE_KEY: '(your key)'
+
+# Jira exported xml
+JIRA_XML_FILE: '/home/alex/JiraMigration/entities.xml'
+
+# Jira attachment directory
+JIRA_ATTACHMENTS_DIR: '/home/alex/JiraMigration/attachments'
+
+# Result MySQL file to run post import
+SQL_OUTPUT_FILE: '/home/alex/JiraMigration/migrate.sql'
+
+# Result attachment directory
+ATTACHMENTS_OUTPUT_DIR: '/home/alex/JiraMigration/jira'
+
+# Sqlite database file (required for cross-project references)
+SQLITE_FILE: '/home/alex/JiraMigration/storage.db'
+
+# Running modes:
+# 0 - basic validation of statuses, types, priorities mapping
+# 1 - #0 + create non-existing users only (all not locked)
+# 2 - #0 + set all users as not locked (required for issue assigning during project import)
+# 3 - #0 + set all users locked status based on Jira active/non-active (after projects imported)
+# 4 - #0 + #1 + create non-existing users (all not locked), project import
+# 5 - cleanup storage for project PROJECT_TO_IMPORT, usefull when deleting it in Redmine in order to re-run
+# 6 - cross project relations processing
+RUNNING_MODE: 0
+
+# Project code to be  imported, use commas for multiple ones
+PROJECT_TO_IMPORT: 'project1,project2'
+
+# Empty to disable creating internal subproject and moving internal issues there
+INTERNAL_PROJECT_POSTFIX: ''
+
+# Redmine anonymous user
+ANONYMOUS_USER_ID: 4
+
+# Disable sending emails by adding .local to email domains when user created
+POSTFIX_USER_MAIL_DOMAIN: '.local'
+
+# Custom fields to be imported, Jira custom field name : Redmine custom field name
+CUSTOM_FIELDS: {
+    '%issue key%': 'Source Reference',
+    'Scope Reference': 'Scope Reference',
+    'Scope Change Number': 'Scope Change Number'
+}
+
+# Default role name for users
+DEFAULT_USER_ROLE: 'developer'
+
+# Status mapping between Jira and Redmine
+STATUS_ALIASES: {
+    'open': 'new',
+    'to do': 'new',
+    'done': 'resolved',
+    'review': 'resolved',
+    'rework': 'in progress',
+    'reopened': 'in progress',
+    'work queue': 'in progress',
+    'in client testing': 'in progress',
+    'billing': 'in progress',
+    'documenting': 'in progress',
+    'cancelled': 'cancelled',
+    'deferred': 'deferred',
+    'needs estimate': 'in progress',
+    'feedback': 'in progress',
+    'to be assigned': 'in progress',
+    'in review': 'in progress',
+    'assigned': 'in progress',
+    'in verification': 'in progress',
+    'waiting for approval': 'in progress',
+    're-opened': 'in progress',
+    'backlog': 'in progress',
+    'selected for development': 'in progress',
+    'qa queue': 'in progress',
+    'ready for release': 'in progress',
+    'internal testing': 'in progress',
+    'rework from qa': 'in progress',
+    'retesting': 'in progress',
+    'rework from client': 'in progress',
+    'returned from client': 'in progress',
+    'retesting from client': 'in progress',
+    'rework ready': 'in progress',
+    'review queue': 'in progress',
+    'in testing': 'in progress'
+}
+
+# Tracker mapping between Jira and Redmine
+TRACKER_ALIASES: {
+    'epic': 'feature',
+    'story': 'feature',
+    'task': 'task',
+    'sub-task': 'task',
+    'defect': 'bug',
+    'improvement': 'feature',
+    'new feature': 'feature',
+    'management': 'depreciated',
+    'project task': 'task',
+    'scope change': 'change request',
+    'sub-scope change': 'change request',
+    'incident': 'depreciated',
+    'tbc': 'depreciated',
+    'test case': 'depreciated',
+    'prospecting': 'depreciated',
+    'account management': 'depreciated',
+    'marketing admin': 'depreciated',
+    'presentation': 'depreciated',
+    'travel': 'depreciated',
+    'proposal prep': 'depreciated',
+    'requirements gathering': 'depreciated',
+    'communications': 'depreciated',
+    'vacation': 'depreciated',
+    'sick days': 'depreciated',
+    'time off': 'depreciated',
+    'nonconformity': 'depreciated',
+    'partial conformity': 'depreciated',
+    'area of concern': 'depreciated',
+    'good practice': 'depreciated',
+    'opportunity for improvement': 'depreciated',
+    'audit sub-task': 'depreciated',
+    'usability': 'depreciated',
+    'recommendation': 'feature',
+    'project': 'depreciated'
+}
+
+# Priority mapping between Jira and Redmine
+PRIORITY_ALIASES: {
+    'lowest': 'low',
+    'highest': 'urgent',
+    'medium': 'normal'
+}

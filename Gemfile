@@ -1,0 +1,11 @@
+source 'https://rubygems.org'
+
+gem 'activerecord'
+gem 'bundler'
+gem 'httparty'
+gem 'nokogiri'
+gem 'pry-byebug'
+gem 'rake'
+gem 'remove_emoji'
+gem 'sqlite3'
+gem 'colorize'
