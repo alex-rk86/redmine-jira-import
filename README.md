@@ -130,11 +130,11 @@ for Arch:
 sudo pacman -S ruby ruby-irb
 ```
 
-Add to your shell profile since we want to use user installed gems:
-"
+Add to your shell profile since we want to use user installed gems:  
+"...  
 export GEM_HOME="$(ruby -e 'puts Gem.user_dir')"  
-export PATH="$PATH:$GEM_HOME/bin"
-"
+export PATH="$PATH:$GEM_HOME/bin"  
+..."  
 Restart your terminal session.
 
 ```
