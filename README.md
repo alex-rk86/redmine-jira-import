@@ -166,7 +166,7 @@ Notice the post processing part there - the import uses Redmine REST plus SQL ex
 at the end (plus copying generated attachment files).
 
 ```
-run
+./run
 ```
 
 Review the import process, make adjustment, repeat if required.
