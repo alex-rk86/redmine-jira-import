@@ -27,7 +27,6 @@ namespace :redmine do
     end
 
     def select_users(uri, type, *attributes)
-      # alexm
       # response = HTTParty.get(@url + "%s.json" % uri,
       response = HTTParty.get(@url + '%s.json?limit=1000&status=' % uri,
                               headers: { 'X-Redmine-API-Key' => @key, "Content-Type": 'application/json' })
@@ -54,7 +53,6 @@ namespace :redmine do
         p response.code
         p response.body
 
-        binding.pry
         raise "[Error: %s] Can't reach the API!" % response.code
       end
     end
