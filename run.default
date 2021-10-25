@@ -29,9 +29,12 @@ fi
 
 # For remote redmine server
 # if test -f "$SQL_OUTPUT_FILE"; then
-# read -p "Press enter for post processing..."
+# read -p "Press enter for moving files to redmine server..."
 # scp $SQL_OUTPUT_FILE user@example.com:/home/alex/JiraMigration
 # scp $FILES_OUTPUT_DIR/* user@example.com:/home/alex/JiraMigration/jira/
+else
+echo Nothing to process...
+fi
 
 # On redmine server
 # echo Updating sql...
