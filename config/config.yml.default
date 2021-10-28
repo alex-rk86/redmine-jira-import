@@ -24,8 +24,8 @@ SQLITE_FILE: '/home/alex/JiraMigration/storage.db'
 # 1 - #0 + create non-existing users only (all not locked)
 # 2 - #0 + set all users as not locked (required for issue assigning during project import)
 # 3 - #0 + set all users locked status based on Jira active/non-active (after projects imported)
-# 4 - #0 + #1 + create non-existing users (all not locked), project import
-# 5 - cleanup storage for project PROJECT_TO_IMPORT, usefull when deleting it in Redmine in order to re-run
+# 4 - #0 + #1 + project(s) import
+# 5 - cleanup storage for project(s) PROJECT_TO_IMPORT, usefull when deleting it in Redmine in order to re-run
 # 6 - cross project relations processing
 RUNNING_MODE: 0
 
