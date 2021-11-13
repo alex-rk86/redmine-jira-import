@@ -2,7 +2,7 @@
 SQL_OUTPUT_FILE="/home/alex/JiraMigration/migrate.sql"
 FILES_OUTPUT_DIR="/home/alex/JiraMigration/jira"
 REDMINE_DOCKER_SQL_NAME="redmine-mariadb"
-REDMINE_DOCKER_FILES_DIR="/var/lib/docker/volumes/redmine_redmine_data/_data/redmine/files/jira"
+REDMINE_DOCKER_FILES_DIR="/opt/redmine/redmine_data/redmine/files/jira"
 
 echo Cleaning old processing files...
 rm $SQL_OUTPUT_FILE
@@ -32,9 +32,9 @@ fi
 # read -p "Press enter for moving files to redmine server..."
 # scp $SQL_OUTPUT_FILE user@example.com:/home/alex/JiraMigration
 # scp $FILES_OUTPUT_DIR/* user@example.com:/home/alex/JiraMigration/jira/
-else
-echo Nothing to process...
-fi
+# else
+# echo Nothing to process...
+# fi
 
 # On redmine server
 # echo Updating sql...

@@ -21,7 +21,7 @@ SQLITE_FILE: '/home/alex/JiraMigration/storage.db'
 
 # Running modes:
 # 0 - basic validation of statuses, types, priorities mapping
-# 1 - #0 + create non-existing users only (all not locked)
+# 1 - #0 + create non-existing users only
 # 2 - #0 + set all users as not locked (required for issue assigning during project import)
 # 3 - #0 + set all users locked status based on Jira active/non-active (after projects imported)
 # 4 - #0 + #1 + project(s) import
@@ -42,8 +42,10 @@ ANONYMOUS_USER_ID: 4
 POSTFIX_USER_MAIL_DOMAIN: '.local'
 
 # Custom fields to be imported, Jira custom field name : Redmine custom field name
+# special fields are %issue key% - Jira issue key, %label% - Jira label(s)
 CUSTOM_FIELDS: {
     '%issue key%': 'Source Reference',
+    '%label%':  'Labels',
     'Scope Reference': 'Scope Reference',
     'Scope Change Number': 'Scope Change Number'
 }

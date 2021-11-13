@@ -23,6 +23,7 @@ namespace :jira do
   # Main Jira import class
   class Import
     JIRA_ISSUE_KEY = '%issue key%'.freeze
+    JIRA_LABEL_KEY = '%label%'.freeze
 
     JiraProject = ExtendedStruct.new(:name, :lead, :description, :key)
     JiraProjectVersion = ExtendedStruct.new(:project, :name, :description)
@@ -38,6 +39,7 @@ namespace :jira do
     JiraNodeAssociation = ExtendedStruct.new(:sourceNodeId, :sourceNodeEntity, :sinkNodeId, :sinkNodeEntity,
                                              :associationType)
     JiraCustomFieldValue = ExtendedStruct.new(:issue, :customfield, :stringvalue)
+    JiraLabel = ExtendedStruct.new(:issue, :label)
 
     def initialize
       @app_config = YAML.load_file('./config/config.yml')
@@ -126,6 +128,8 @@ namespace :jira do
           load_jira_worklogs
           puts 'Loading Jira custom field values...'
           load_jira_customfield_values
+          puts 'Loading Jira labels...'
+          load_jira_labels
           puts 'Migrate projects...'
           migrate_projects
           puts 'Migrate issues...'
@@ -219,9 +223,12 @@ namespace :jira do
         redmine_customfield = redmine_customfields.find { |v| v[:name].downcase == redmine_field.downcase }
         if !redmine_customfield.nil?
           puts format('  - redmine custom field id assigned: %s', redmine_customfield[:id])
-          if jira_field.downcase == JIRA_ISSUE_KEY #special case to map jira issue key
+          if jira_field.downcase == JIRA_ISSUE_KEY # special case to map jira issue key
             puts '  - special case, Jira issue key to be used'
             @customfields_binding[JIRA_ISSUE_KEY] = redmine_customfield[:id]
+          elsif jira_field.downcase == JIRA_LABEL_KEY # special case to map jira labels
+            puts '  - special case, Jira label to be used'
+            @customfields_binding[JIRA_LABEL_KEY] = redmine_customfield[:id]
           else
             jirafields = @customfields.select { |_id, name| name.downcase == jira_field.downcase }
             if !jirafields.empty?
@@ -253,7 +260,7 @@ namespace :jira do
         info[:firstname] = info[:firstname].strip
         info[:lasttname] = info[:lastname].strip
         redmine_user = redmine_users.find { |v| v[:login].downcase == info[:login] }
-        if redmine_user.nil? || @app_config['RUNNING_MODE'].between?(2,3)
+        if redmine_user.nil? || @app_config['RUNNING_MODE'].between?(2, 3)
           if info[:firstname].empty?
             names = info[:displayname].split(' ', 2)
             if names.count == 2
@@ -561,6 +568,14 @@ namespace :jira do
       custom_fields = {}
       result_fields = []
       custom_fields[@customfields_binding[JIRA_ISSUE_KEY]] = format('[%s]', info.key) if @customfields_binding.key?(JIRA_ISSUE_KEY)
+      if @customfields_binding.key?(JIRA_LABEL_KEY)
+        labels = @labels.select { |_k, v| v.issue == id }
+        unless labels.empty?
+          label = ''
+          labels.each { |_k, v| label += format('[%s]', v.label) }
+          custom_fields[@customfields_binding[JIRA_LABEL_KEY]] = label
+        end
+      end
       customvalues = @customfield_values.select { |_k, v| v[:issue] == id }
       unless customvalues.empty?
         customvalues.each do |_k, v|
@@ -575,7 +590,6 @@ namespace :jira do
 
     def load_jira_statuses
       @statuses = {}
-
       get_list_from_tag('/*/Status', :name, :id).each do |v|
         @statuses[v['id']] = v['name']
       end
@@ -584,7 +598,6 @@ namespace :jira do
 
     def load_jira_users
       @users = {}
-
       get_list_from_tag('/*/User', :id, :userName, :emailAddress, :firstName, :lastName, :active, :displayName).each do |v|
         @users[v['id']] = { login: v['userName'].gsub('ø', 'o'),
                             mail: v['emailAddress'], firstname: v['firstName'].gsub('ø', 'o'), lastname: v['lastName'].truncate(30).gsub('ø', 'o'),
@@ -595,7 +608,6 @@ namespace :jira do
 
     def load_jira_user_aliases
       @user_aliases = {}
-
       get_list_from_tag('/*/ApplicationUser', :id, :userKey, :lowerUserName).each do |v|
         @user_aliases[v['id']] = { id: v['id'], userKey: v['userKey'], lowerUserName: v['lowerUserName'] }
       end
@@ -611,7 +623,6 @@ namespace :jira do
 
     def load_jira_types
       @types = {}
-
       get_list_from_tag('/*/IssueType', :name, :id).each do |v|
         @types[v['id']] = v['name']
       end
@@ -620,7 +631,6 @@ namespace :jira do
 
     def load_jira_priorities
       @priorities = {}
-
       get_list_from_tag('/*/Priority', :name, :id).each do |v|
         @priorities[v['id']] = v['name']
       end
@@ -629,7 +639,6 @@ namespace :jira do
 
     def load_jira_projects
       @projects = {}
-
       get_list_from_tag('/*/Project', :id, :name, :key, :lead, :description).each do |v|
         @projects[v['id']] = JiraProject.new(v) if @app_config['PROJECT_TO_IMPORT'].downcase.split(',').include?(v['key'].downcase)
       end
@@ -638,7 +647,6 @@ namespace :jira do
 
     def load_jira_project_versions
       @projectversions = {}
-
       get_list_from_tag('/*/Version', :id, :project, :name, :description).each do |v|
         @projectversions[v['id']] = JiraProjectVersion.new(v) if @projects.key?(v['project'])
       end
@@ -728,6 +736,18 @@ namespace :jira do
       puts format(' - loaded %s', @customfield_values.count)
     end
 
+    def load_jira_labels
+      @labels = {}
+      if @customfields_binding.key?(JIRA_LABEL_KEY)
+        get_list_from_tag('/*/Label', :id, :issue, :label).each do |v|
+          @labels[v['id']] = JiraLabel.new(v) if @issues.key?(v['issue'])
+        end
+        puts format(' - loaded %s', @labels.count)
+      else
+        puts format(' - not required, no mapping for "%s" field found', JIRA_LABEL_KEY)
+      end
+    end
+
     def get_list_from_tag(query, *attributes)
       ret = []
       temp_ret = []
@@ -744,7 +764,6 @@ namespace :jira do
         end
         ret.push(Hash[temp_ret])
       end
-
       ret
     end
 

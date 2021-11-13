@@ -35,6 +35,7 @@ with number of improvements and extensions:
 - Removing of history changes with the same status, like In Progress -> In Progress due consolidated statuses.
 - Text custom fields support with configurable mapping
 - Mostly changed settings moved to config file
+- Support for Jira labels (can be mapped to custom field)
 - Something I likely forgot...
 
 
@@ -174,6 +175,7 @@ Review the import process, make adjustment, repeat if required.
 Typical workflow would be to use the RUNNING_MODE as:
 - 0 - initial check
 - 1 - importing users only
+- 2 - enabling all users
 - 4 - importing some project(s)
 
 Review the project import, if not happy - delete the project from Redmine.
