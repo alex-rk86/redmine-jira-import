@@ -41,7 +41,7 @@ with number of improvements and extensions:
 
 ## Supported
 * **Users**
-* **Project:**
+* **Project**
 * **Project members role**
 * **Issues**
 * **Issues history**
