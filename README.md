@@ -45,6 +45,7 @@ with number of improvements and extensions:
 * **Project members role**
 * **Issues**
 * **Issues history**
+* **Issues labels**
 * **Worklogs**
 * **Attachments**
 * **Subtasks and relations**
