@@ -48,6 +48,15 @@ CUSTOM_FIELDS: {
     '%label%':  'Labels',
     'Scope Reference': 'Scope Reference',
     'Scope Change Number': 'Scope Change Number'
+    'Original Project': 'Original Project'
+}
+
+# Additional transformation for custom fields when some logic needs to be applied
+# Currently only %project_id->project_key% to convert value in Jira custom field
+# stored as number (project id) to project key in Redmine custom field.
+# Not very elegant implementation, extend it as you need...
+CUSTOM_FIELD_TRANSFORMATIONS: {
+    'Original Project': '%project_id->project_key%'
 }
 
 # Default role name for users

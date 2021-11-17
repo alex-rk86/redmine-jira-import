@@ -38,7 +38,7 @@ namespace :jira do
     JiraHistoryGroup = ExtendedStruct.new(:issue, :author, :created)
     JiraNodeAssociation = ExtendedStruct.new(:sourceNodeId, :sourceNodeEntity, :sinkNodeId, :sinkNodeEntity,
                                              :associationType)
-    JiraCustomFieldValue = ExtendedStruct.new(:issue, :customfield, :stringvalue)
+    JiraCustomFieldValue = ExtendedStruct.new(:issue, :customfield, :stringvalue, :numbervalue)
     JiraLabel = ExtendedStruct.new(:issue, :label)
 
     def initialize
@@ -87,16 +87,16 @@ namespace :jira do
         puts 'Prepare roles...'
         prepare_roles
 
-        puts 'Prepare statuses...'
+        puts 'Preparing statuses...'
         raise '[Error] Sorry! Undefined statuses found!' if prepare_statuses.positive?
 
-        puts 'Prepare trackers...'
+        puts 'Preparing trackers...'
         raise '[Error] Sorry! Undefined trackers found!' if prepare_trackers.positive?
 
-        puts 'Prepare priorities...'
+        puts 'Preparing priorities...'
         raise '[Error] Sorry! Undefined priorities found!' if prepare_priorities.positive?
 
-        puts 'Prepare custom fields...'
+        puts 'Preparing custom fields...'
         raise '[Error] Sorry! Undefined custom fields found!' if prepare_customfields.positive?
 
         if @app_config['RUNNING_MODE'].between?(1, 4)
@@ -216,6 +216,7 @@ namespace :jira do
 
     def prepare_customfields
       @customfields_binding = {}
+      @customfield_transformations = {}
       redmine_customfields = @connector.custom_fields
       count = 0
       @app_config['CUSTOM_FIELDS'].each do |jira_field, redmine_field|
@@ -235,9 +236,13 @@ namespace :jira do
               jirafields.each do |k, _v|
                 puts format('  - jira custom field id assigned: %s', k)
                 @customfields_binding[k] = redmine_customfield[:id]
-              end
+                if @app_config['CUSTOM_FIELD_TRANSFORMATIONS'].key?(jira_field)
+                  @customfield_transformations[k] = @app_config['CUSTOM_FIELD_TRANSFORMATIONS'][jira_field]
+                  puts format('  - adding custom field transformation: "%s" -> "%s"', jira_field.downcase, @customfield_transformations[k])
+                end
+              end.first
             else
-              puts ' - jira custom field not found!'
+              puts '  - jira custom field not found!'
               count += 1
             end
           end
@@ -579,7 +584,20 @@ namespace :jira do
       customvalues = @customfield_values.select { |_k, v| v[:issue] == id }
       unless customvalues.empty?
         customvalues.each do |_k, v|
-          custom_fields[@customfields_binding[v[:customfield]]] = v[:stringvalue] if @customfields_binding.key?(v[:customfield])
+          if @customfields_binding.key?(v[:customfield])
+            if @customfield_transformations.key?(v[:customfield])
+              case @customfield_transformations[v[:customfield]]
+              when '%project_id->project_key%'
+                # convering jira custom field (numeric) to corresponding jira project key
+                custom_fields[@customfields_binding[v[:customfield]]] = @project_keys[v[:numbervalue].to_i.to_s]
+                puts format(' - custom field tranformation "%s", "%s" -> "%s"', @customfield_transformations[v[:customfield]], v[:numbervalue], custom_fields[@customfields_binding[v[:customfield]]])
+              else
+                puts format(' - unknown custom field transformation: %s', @custom_field_transformations[v[:customfield]])
+              end
+            else
+              custom_fields[@customfields_binding[v[:customfield]]] = v[:stringvalue]
+            end
+          end
         end
       end
       custom_fields.each do |k, v|
@@ -639,8 +657,10 @@ namespace :jira do
 
     def load_jira_projects
       @projects = {}
+      @project_keys = {} # required for specific custom field parsing
       get_list_from_tag('/*/Project', :id, :name, :key, :lead, :description).each do |v|
         @projects[v['id']] = JiraProject.new(v) if @app_config['PROJECT_TO_IMPORT'].downcase.split(',').include?(v['key'].downcase)
+        @project_keys[v['id']] = v['key'].downcase
       end
       puts format(' - loaded %s', @projects.count)
     end
@@ -730,7 +750,7 @@ namespace :jira do
 
     def load_jira_customfield_values
       @customfield_values = {}
-      get_list_from_tag('/*/CustomFieldValue', :id, :issue, :customfield, :stringvalue).each do |v|
+      get_list_from_tag('/*/CustomFieldValue', :id, :issue, :customfield, :stringvalue, :numbervalue).each do |v|
         @customfield_values[v['id']] = JiraCustomFieldValue.new(v) if @issues.key?(v['issue']) && @customfields_binding.key?(v['customfield'])
       end
       puts format(' - loaded %s', @customfield_values.count)
