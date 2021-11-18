@@ -47,7 +47,7 @@ CUSTOM_FIELDS: {
     '%issue key%': 'Source Reference',
     '%label%':  'Labels',
     'Scope Reference': 'Scope Reference',
-    'Scope Change Number': 'Scope Change Number'
+    'Scope Change Number': 'Scope Change Number',
     'Original Project': 'Original Project'
 }
 
