@@ -25,7 +25,7 @@ namespace :jira do
     JIRA_ISSUE_KEY = '%issue key%'.freeze
     JIRA_LABEL_KEY = '%label%'.freeze
 
-    JiraProject = ExtendedStruct.new(:name, :lead, :description, :key)
+    JiraProject = ExtendedStruct.new(:name, :lead, :description, :key, :originalkey)
     JiraProjectVersion = ExtendedStruct.new(:project, :name, :description)
     JiraIssue = ExtendedStruct.new(:key, :project, :creator, :assignee, :type, :summary, :description,
                                    :priority, :status, :created, :updated, :security, :timeoriginalestimate,
@@ -304,7 +304,7 @@ namespace :jira do
       redmine_projects = @connector.projects
 
       @projects.each do |id, info|
-        puts ' - found project: %s' % info.key
+        puts format(' - found project: %s, original key: %s', info.key, info.originalkey)
         redmine_project = redmine_projects.select { |v| v[:identifier] == info.key.downcase }.first
         if !redmine_project.nil?
           puts ' - project  already exists: "%s"' % redmine_project[:identifier]
@@ -420,20 +420,21 @@ namespace :jira do
         end
 
         attaches = @attaches.select { |_k, v| v.issue == id }
-        if attaches.length > 0
+        unless attaches.empty?
           attaches.each do |aid, ainfo|
             found = true
-            attachment_file = File.join(@jirafiles, @projects[info.project].key, info.key, aid)
+            # binding.pry
+            pkey = @projects[info.project].originalkey
+            ikey = info.key.include?(@projects[info.project].key) ? (info.key.sub! @projects[info.project].key, @projects[info.project].originalkey) : info.key
+            attachment_file = File.join(@jirafiles, pkey, ikey, aid)
             unless File.exist? attachment_file
-              attachment_file = File.join(@jirafiles, @projects[info.project].key, info.key,
-                                          aid + '_' + ainfo[:filename])
+              attachment_file = File.join(@jirafiles, pkey, ikey, aid + '_' + ainfo[:filename])
             end
             unless File.exist? attachment_file
-              attachment_file = File.join(@jirafiles, @projects[info.project].key, '10000', info.key, aid)
+              attachment_file = File.join(@jirafiles, pkey, '10000', ikey, aid)
             end
             unless File.exist? attachment_file
-              attachment_file = File.join(@jirafiles, @projects[info.project].key, '10000', info.key,
-                                          aid + '_' + ainfo[:filename])
+              attachment_file = File.join(@jirafiles, pkey, '10000', ikey, aid + '_' + ainfo[:filename])
             end
             unless File.exist? attachment_file
               puts ' - attachment file does not exists: %s!' % attachment_file
@@ -658,7 +659,7 @@ namespace :jira do
     def load_jira_projects
       @projects = {}
       @project_keys = {} # required for specific custom field parsing
-      get_list_from_tag('/*/Project', :id, :name, :key, :lead, :description).each do |v|
+      get_list_from_tag('/*/Project', :id, :name, :key, :lead, :description, :originalkey).each do |v|
         @projects[v['id']] = JiraProject.new(v) if @app_config['PROJECT_TO_IMPORT'].downcase.split(',').include?(v['key'].downcase)
         @project_keys[v['id']] = v['key'].downcase
       end
