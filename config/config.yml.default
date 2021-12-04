@@ -108,7 +108,7 @@ TRACKER_ALIASES: {
     'defect': 'bug',
     'improvement': 'feature',
     'new feature': 'feature',
-    'management': 'depreciated',
+    'management': 'task',
     'project task': 'task',
     'scope change': 'change request',
     'sub-scope change': 'change request',
