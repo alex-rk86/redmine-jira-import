@@ -42,7 +42,7 @@ ANONYMOUS_USER_ID: 4
 POSTFIX_USER_MAIL_DOMAIN: '.local'
 
 # Custom fields to be imported, Jira custom field name : Redmine custom field name
-# special fields are %issue key% - Jira issue key, %label% - Jira label(s)
+# special fields: %issue key% - Jira issue key, %label% - Jira label(s)
 CUSTOM_FIELDS: {
     '%issue key%': 'Source Reference',
     '%label%':  'Labels',
