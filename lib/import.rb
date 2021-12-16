@@ -38,7 +38,8 @@ namespace :jira do
     JiraHistoryGroup = ExtendedStruct.new(:issue, :author, :created)
     JiraNodeAssociation = ExtendedStruct.new(:sourceNodeId, :sourceNodeEntity, :sinkNodeId, :sinkNodeEntity,
                                              :associationType)
-    JiraCustomFieldValue = ExtendedStruct.new(:issue, :customfield, :stringvalue, :numbervalue)
+    JiraCustomField = ExtendedStruct.new(:customfieldtypekey, :name)
+    JiraCustomFieldValue = ExtendedStruct.new(:issue, :customfield, :stringvalue, :textvalue, :datevalue, :numbervalue)
     JiraLabel = ExtendedStruct.new(:issue, :label)
 
     def initialize
@@ -159,15 +160,15 @@ namespace :jira do
       redmine_statuses = @connector.statuses
       count = 0
       @statuses.each do |id, name|
-        puts ' - status found: %s' % name
+        print ' - status mapping: %s -> ' % name
         search = name.downcase
         search = @app_config['STATUS_ALIASES'][search] if @app_config['STATUS_ALIASES'].key?(search)
         redmine_status = redmine_statuses.select { |v| v[:name].downcase == search }.first
         if !redmine_status.nil?
-          puts ' - status assigned: %s!' % redmine_status[:name]
+          puts redmine_status[:name]
           @statuses_binding[id] = redmine_status[:id]
         else
-          puts ' - undefined status: %s' % name
+          puts 'Nil!'.red
           count += 1
         end
       end
@@ -179,15 +180,15 @@ namespace :jira do
       redmine_trackers = @connector.trackers
       count = 0
       @types.each do |id, name|
-        puts ' - tracker found: %s' % name
+        print ' - tracker mapping: %s -> ' % name
         search = name.downcase
         search = @app_config['TRACKER_ALIASES'][search] if @app_config['TRACKER_ALIASES'].key?(search)
         redmine_tracker = redmine_trackers.select { |v| v[:name].downcase == search }.first
         if !redmine_tracker.nil?
-          puts ' - tracker assigned: %s!' % redmine_tracker[:name]
+          puts redmine_tracker[:name]
           @trackers_binding[id] = redmine_tracker[:id]
         else
-          puts ' - undefined tracker: %s' % name
+          puts 'Nil!'.red
           count += 1
         end
       end
@@ -199,15 +200,15 @@ namespace :jira do
       redmine_priorities = @connector.priorities
       count = 0
       @priorities.each do |id, name|
-        puts ' - priority found: %s' % name
+        print ' - priority mapping: %s -> ' % name
         search = name.downcase
         search = @app_config['PRIORITY_ALIASES'][search] if @app_config['PRIORITY_ALIASES'].key?(search)
         redmine_priority = redmine_priorities.select { |v| v[:name].downcase == search }.first
         if !redmine_priority.nil?
-          puts ' - priority assigned: %s!' % redmine_priority[:name]
+          puts redmine_priority[:name]
           @priorities_binding[id] = redmine_priority[:id]
         else
-          puts ' - undefined priority: %s' % name
+          puts 'Nil!'.red
           count += 1
         end
       end
@@ -231,7 +232,7 @@ namespace :jira do
             puts '  - special case, Jira label to be used'
             @customfields_binding[JIRA_LABEL_KEY] = redmine_customfield[:id]
           else
-            jirafields = @customfields.select { |_id, name| name.downcase == jira_field.downcase }
+            jirafields = @customfields.select { |_id, v| v[:name].downcase == jira_field.downcase }
             if !jirafields.empty?
               jirafields.each do |k, _v|
                 puts format('  - jira custom field id assigned: %s', k)
@@ -593,10 +594,25 @@ namespace :jira do
                 custom_fields[@customfields_binding[v[:customfield]]] = @project_keys[v[:numbervalue].to_i.to_s]
                 puts format(' - custom field tranformation "%s", "%s" -> "%s"', @customfield_transformations[v[:customfield]], v[:numbervalue], custom_fields[@customfields_binding[v[:customfield]]])
               else
-                puts format(' - unknown custom field transformation: %s', @custom_field_transformations[v[:customfield]])
+                # custom transformation mapping
+                if @customfield_transformations[v[:customfield]].key?(v[:stringvalue])
+                  custom_fields[@customfields_binding[v[:customfield]]] = @customfield_transformations[v[:customfield]][v[:stringvalue]]
+                  puts format(' - custom field tranformation "%s", "%s" -> "%s"', @customfield_transformations[v[:customfield]], v[:stringvalue], custom_fields[@customfields_binding[v[:customfield]]])
+                else
+                  puts format(' - UNKNOWN custom field tranformation mapping "%s", "%s" -> "%s"', @customfield_transformations[v[:customfield]], v[:numbervalue], 'Nil!'.red)
+                end
               end
             else
-              custom_fields[@customfields_binding[v[:customfield]]] = v[:stringvalue]
+              # binding.pry
+              if @customfields[v[:customfield]][:customfieldtypekey] == 'textarea'
+                custom_fields[@customfields_binding[v[:customfield]]] = v[:textvalue]
+              elsif @customfields[v[:customfield]][:customfieldtypekey] == 'date'
+                custom_fields[@customfields_binding[v[:customfield]]] = v[:datevalue]
+              elsif @customfields[v[:customfield]][:customfieldtypekey] == 'float'
+                custom_fields[@customfields_binding[v[:customfield]]] = v[:numbervalue]
+              else
+                custom_fields[@customfields_binding[v[:customfield]]] = v[:stringvalue]
+              end
             end
           end
         end
@@ -743,8 +759,8 @@ namespace :jira do
 
     def load_jira_customfields
       @customfields = {}
-      get_list_from_tag('/*/CustomField', :id, :name).each do |v|
-        @customfields[v['id']] = v['name']
+      get_list_from_tag('/*/CustomField', :id, :customfieldtypekey, :name).each do |v|
+        @customfields[v['id']] = JiraCustomField.new(v)
       end
       puts format(' - loaded %s', @customfields.count)
     end
