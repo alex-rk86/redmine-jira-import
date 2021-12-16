@@ -33,7 +33,7 @@ with number of improvements and extensions:
 - Removing emojis from issue and notes text
 - During user creating adding fake '.local' to user domain to block any email sent, configurable
 - Removing of history changes with the same status, like In Progress -> In Progress due consolidated statuses.
-- Text custom fields support with configurable mapping
+- Custom fields support with configurable mapping and transformation
 - Mostly changed settings moved to config file
 - Support for Jira labels (can be mapped to custom field)
 - Something I likely forgot...
