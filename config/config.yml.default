@@ -58,9 +58,9 @@ CUSTOM_FIELDS: {
 
 # Additional transformation for custom fields when additional logic needs to be applied
 # Options:
-# 1. '(MappedRedmineField1)': %project_id->project_key% to convert value in Jira custom field
+# 1. 'JiraCustomField1': %project_id->project_key% to convert value in Jira custom field
 #    stored as number (project id) to project key in Redmine custom field.
-# 2. '(MappedRedmineField2)': {(JiraValue1): MappedValue1, (JiraValue2): MappedValue2}
+# 2. 'JiraCustomField2': {JiraValue1: MappedValue1, JiraValue2: MappedValue2}
 CUSTOM_FIELD_TRANSFORMATIONS: {
     'Original Project': '%project_id->project_key%',
     'Severity': {'10596': 'Critical', '10597': 'Major', '10598': 'Minor', '10599': 'Trivial'}
