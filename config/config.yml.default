@@ -48,15 +48,22 @@ CUSTOM_FIELDS: {
     '%label%':  'Labels',
     'Scope Reference': 'Scope Reference',
     'Scope Change Number': 'Scope Change Number',
-    'Original Project': 'Original Project'
+    'Original Project': 'Original Project',
+    'Severity': 'Severity',
+    'Release Notes': 'Release Notes',
+    'Configuration Changes': 'Configuration Changes',
+    'Test Guidance': 'Test Guidance',
+    'First Response': 'First Response'
 }
 
-# Additional transformation for custom fields when some logic needs to be applied
-# Currently only %project_id->project_key% to convert value in Jira custom field
-# stored as number (project id) to project key in Redmine custom field.
-# Not very elegant implementation, extend it as you need...
+# Additional transformation for custom fields when additional logic needs to be applied
+# Options:
+# 1. '(MappedRedmineField1)': %project_id->project_key% to convert value in Jira custom field
+#    stored as number (project id) to project key in Redmine custom field.
+# 2. '(MappedRedmineField2)': {(JiraValue1): MappedValue1, (JiraValue2): MappedValue2}
 CUSTOM_FIELD_TRANSFORMATIONS: {
-    'Original Project': '%project_id->project_key%'
+    'Original Project': '%project_id->project_key%',
+    'Severity': {'10596': 'Critical', '10597': 'Major', '10598': 'Minor', '10599': 'Trivial'}
 }
 
 # Default role name for users
