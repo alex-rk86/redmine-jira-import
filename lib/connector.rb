@@ -112,12 +112,12 @@ namespace :redmine do
     end
 
     def create_project(data)
-      filter insert('/projects', { project: { name: data[:name], identifier: data[:key].downcase, is_public: 'false' }}),
+      filter insert('/projects', { project: { name: data[:name], identifier: data[:key].downcase, description: data[:description], is_public: 'false' } }),
              :project, :id, :name, :identifier
     end
 
     def create_subproject(data, project_parent_id)
-      filter insert('/projects', { project: { name: data[:name], identifier: data[:key].downcase, is_public: 'false', parent_id: project_parent_id }}),
+      filter insert('/projects', { project: { name: data[:name], identifier: data[:key].downcase, description: data[:description], is_public: 'false', parent_id: project_parent_id } }),
              :project, :id, :name, :identifier
     end
 

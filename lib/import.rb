@@ -603,12 +603,12 @@ namespace :jira do
                 end
               end
             else
-              # binding.pry
-              if @customfields[v[:customfield]][:customfieldtypekey] == 'textarea'
+              if @customfields[v[:customfield]][:customfieldtypekey].include?('textarea')
                 custom_fields[@customfields_binding[v[:customfield]]] = v[:textvalue]
-              elsif @customfields[v[:customfield]][:customfieldtypekey] == 'date'
-                custom_fields[@customfields_binding[v[:customfield]]] = v[:datevalue]
-              elsif @customfields[v[:customfield]][:customfieldtypekey] == 'float'
+              elsif @customfields[v[:customfield]][:customfieldtypekey].include?('date')
+                # binding.pry
+                custom_fields[@customfields_binding[v[:customfield]]] = Date.strptime(v[:datevalue], '%Y-%m-%d %H:%M:%S')
+              elsif @customfields[v[:customfield]][:customfieldtypekey].include?('float')
                 custom_fields[@customfields_binding[v[:customfield]]] = v[:numbervalue]
               else
                 custom_fields[@customfields_binding[v[:customfield]]] = v[:stringvalue]
@@ -767,7 +767,7 @@ namespace :jira do
 
     def load_jira_customfield_values
       @customfield_values = {}
-      get_list_from_tag('/*/CustomFieldValue', :id, :issue, :customfield, :stringvalue, :numbervalue).each do |v|
+      get_list_from_tag('/*/CustomFieldValue', :id, :issue, :customfield, :stringvalue, :numbervalue, :datevalue, :textvalue).each do |v|
         @customfield_values[v['id']] = JiraCustomFieldValue.new(v) if @issues.key?(v['issue']) && @customfields_binding.key?(v['customfield'])
       end
       puts format(' - loaded %s', @customfield_values.count)
