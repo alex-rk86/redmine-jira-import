@@ -20,9 +20,7 @@ namespace :redmine do
       # response = HTTParty.get(@url + "%s.json" % uri,
       response = HTTParty.get(@url + '%s.json?limit=1000' % uri,
                               headers: { 'X-Redmine-API-Key' => @key, "Content-Type": 'application/json' })
-
-      raise "[Error: %s] Can't reach the API!" % response.code if response.code != 200
-
+      raise format('API error: %s -> %s', response.code, response.message) if response.code != 200
       filter JSON.parse(response.body, symbolize_names: true), type, *attributes
     end
 
@@ -30,39 +28,27 @@ namespace :redmine do
       # response = HTTParty.get(@url + "%s.json" % uri,
       response = HTTParty.get(@url + '%s.json?limit=1000&status=' % uri,
                               headers: { 'X-Redmine-API-Key' => @key, "Content-Type": 'application/json' })
-
-      raise "[Error: %s] Can't reach the API!" % response.code if response.code != 200
-
+      raise format('API error: %s -> %s', response.code, response.message) if response.code != 200
       filter JSON.parse(response.body, symbolize_names: true), type, *attributes
     end
 
     def insert(uri, values)
-      response = HTTParty.post(@url + '%s.json' % uri, query: values,
+      response = HTTParty.post(@url + '%s.json' % uri, body: values.to_json,
                                                        headers: { 'X-Redmine-API-Key' => @key, 'Content-Type' => 'application/json' })
-
-      raise "[Error: %s] Can't reach the API!" % response.code if response.code != 201
-
+      raise format('API error: %s -> %s', response.code, response.message) if response.code != 201
       JSON.parse(response.body, symbolize_names: true)
     end
 
     def update(uri, values)
-      response = HTTParty.put(@url + '%s.json' % uri, query: values,
+      response = HTTParty.put(@url + '%s.json' % uri, body: values.to_json,
                                                       headers: { 'X-Redmine-API-Key' => @key, 'Content-Type' => 'application/json' })
-
-      if (response.code != 200) && (response.code != 204)
-        p response.code
-        p response.body
-
-        raise "[Error: %s] Can't reach the API!" % response.code
-      end
+      raise format('API error: %s -> %s', response.code, response.message) if (response.code != 200) && (response.code != 204)
     end
 
     def filter(data, type, *attributes)
       raise 'Invalid data!' unless data.is_a?(Hash)
-
       type = type.to_sym
       raise 'Invalid response!' unless data.has_key? type
-
       if data[type].is_a?(Array)
         return data[type].map { |u| u.select { |k, _v| attributes.empty? || attributes.include?(k) } }
       end

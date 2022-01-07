@@ -10,7 +10,7 @@ namespace :jira do
 
     def update_issue(id, data)
       store(format(
-              "UPDATE `issues` SET `created_on` = TIMESTAMP('%s'), start_date=TIMESTAMP('%s'), updated_on = TIMESTAMP('%s'), `status_id` = %s, `author_id` = %s, `done_ratio` = %s, `due_date` = TIMESTAMP('%s'), `description` = FROM_BASE64('%s') WHERE id = %s;", data[:created], data[:created], data[:updated], data[:status_id], data[:author_id], data[:done_ratio], data[:duedate], data[:description], id
+              "UPDATE `issues` SET `created_on` = TIMESTAMP('%s'), start_date=TIMESTAMP('%s'), updated_on = TIMESTAMP('%s'), `status_id` = %s, `author_id` = %s, `done_ratio` = %s, `due_date` = TIMESTAMP('%s') WHERE id = %s;", data[:created], data[:created], data[:updated], data[:status_id], data[:author_id], data[:done_ratio], data[:duedate], id
             ))
       store(format(
               "UPDATE `journals` set `created_on` = TIMESTAMP('%s') WHERE `journalized_type`='Issue' AND `journalized_id`='%s';", data[:created], id

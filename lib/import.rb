@@ -366,7 +366,7 @@ namespace :jira do
           tracker_id: @trackers_binding[info.type],
           priority_id: @priorities_binding[info.priority],
           subject: info.summary,
-          # description: info.description,
+          description: info.description.blank? ? '' : RemoveEmoji::Sanitize.call(info.description),
           custom_fields: jira_custom_fields,
           is_private: info.security.nil? || info.security.empty? ? 0 : 1,
           estimated_hours: info.timeoriginalestimate.nil? ? 0 : (info.timeoriginalestimate.to_f / 3600).round(2),
@@ -386,8 +386,7 @@ namespace :jira do
                                 updated: info.updated,
                                 author_id: author_user,
                                 done_ratio: done_ratio_t,
-                                duedate: info.duedate.nil? ? '0000-00-00 00:00:00' : info.duedate,
-                                description: Base64.encode64(info.description.nil? || info.description.empty? ? '' : RemoveEmoji::Sanitize.call(info.description))
+                                duedate: info.duedate.nil? ? '0000-00-00 00:00:00' : info.duedate
                               })
 
         comments = @comments.select { |_k, v| v.issue == id }
@@ -412,7 +411,7 @@ namespace :jira do
             @builder.create_worklog(redmine_issue[:id], {
                                       project_id: @projects_binding[project_id],
                                       user_id: worklog_user,
-                                      comments: Base64.encode64(winfo.body.nil? || winfo.body.empty? ? '< No comment >' : RemoveEmoji::Sanitize.call(winfo.body)),
+                                      comments: Base64.encode64(winfo.body.blank? ? '< No comment >' : RemoveEmoji::Sanitize.call(winfo.body)),
                                       created: winfo.startdate,
                                       hours: winfo.timeworked.nil? ? 0 : (winfo.timeworked.to_f / 3600).round(2),
                                       activity_id: 9
