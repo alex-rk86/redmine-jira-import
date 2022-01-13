@@ -42,10 +42,15 @@ ANONYMOUS_USER_ID: 4
 POSTFIX_USER_MAIL_DOMAIN: '.local'
 
 # Custom fields to be imported, Jira custom field name : Redmine custom field name
-# special fields: %issue key% - Jira issue key, %label% - Jira label(s)
+# special fields:
+# %issue key% - Jira issue key, to some custom text field
+# %label% - Jira label(s), to some custom text field, will be wrapped in [] for each value
+# %fix version%, to some custom text field, will be wrapped in [] for each value, to preserve multiple
+#   values from Jira since the Redmine 'Target Version' can have only one
 CUSTOM_FIELDS: {
     '%issue key%': 'Source Reference',
     '%label%':  'Labels',
+    '%fix version%': 'Imported Fix Version',
     'Scope Reference': 'Scope Reference',
     'Scope Change Number': 'Scope Change Number',
     'Original Project': 'Original Project',

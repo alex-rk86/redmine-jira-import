@@ -24,6 +24,7 @@ namespace :jira do
   class Import
     JIRA_ISSUE_KEY = '%issue key%'.freeze
     JIRA_LABEL_KEY = '%label%'.freeze
+    JIRA_FIX_VERSION_KEY = '%fix version%'.freeze
 
     JiraProject = ExtendedStruct.new(:name, :lead, :description, :key, :originalkey)
     JiraProjectVersion = ExtendedStruct.new(:project, :name, :description)
@@ -231,6 +232,9 @@ namespace :jira do
           elsif jira_field.downcase == JIRA_LABEL_KEY # special case to map jira labels
             puts '  - special case, Jira label to be used'
             @customfields_binding[JIRA_LABEL_KEY] = redmine_customfield[:id]
+          elsif jira_field.downcase == JIRA_FIX_VERSION_KEY # special case to map jira multiple fix versions
+            puts '  - special case, Jira label to be used'
+            @customfields_binding[JIRA_FIX_VERSION_KEY] = redmine_customfield[:id]
           else
             jirafields = @customfields.select { |_id, v| v[:name].downcase == jira_field.downcase }
             if !jirafields.empty?
@@ -423,7 +427,6 @@ namespace :jira do
         unless attaches.empty?
           attaches.each do |aid, ainfo|
             found = true
-            # binding.pry
             pkey = @projects[info.project].originalkey
             ikey = info.key.include?(@projects[info.project].key) ? (info.key.sub! @projects[info.project].key, @projects[info.project].originalkey) : info.key
             attachment_file = File.join(@jirafiles, pkey, ikey, aid)
@@ -580,6 +583,16 @@ namespace :jira do
           label = ''
           labels.each { |_k, v| label += format('[%s]', v.label) }
           custom_fields[@customfields_binding[JIRA_LABEL_KEY]] = label
+        end
+      end
+      if @customfields_binding.key?(JIRA_FIX_VERSION_KEY)
+        unless @nodeassociations.empty?
+          versionnode = @nodeassociations.select { |as| as[:sourceNodeId] == id && as[:sourceNodeEntity] == 'Issue' && as[:associationType] = 'IssueFixVersion' }
+          unless versionnode.empty?
+            fix_version = ''
+            versionnode.each { |v| fix_version += format('[%s]', @projectversions[v.sinkNodeId].name) }
+            custom_fields[@customfields_binding[JIRA_FIX_VERSION_KEY]] = fix_version
+          end
         end
       end
       customvalues = @customfield_values.select { |_k, v| v[:issue] == id }
