@@ -58,7 +58,8 @@ CUSTOM_FIELDS: {
     'Release Notes': 'Release Notes',
     'Configuration Changes': 'Configuration Changes',
     'Test Guidance': 'Test Guidance',
-    'First Response': 'First Response'
+    'First Response': 'First Response',
+    'Issues Found': 'Review'
 }
 
 # Additional transformation for custom fields when additional logic needs to be applied
