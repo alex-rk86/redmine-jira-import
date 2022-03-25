@@ -1,5 +1,6 @@
 source 'https://rubygems.org'
 
+gem 'rdoc'
 gem 'activerecord'
 gem 'bundler'
 gem 'httparty'
