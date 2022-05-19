@@ -57,7 +57,7 @@ with number of improvements and extensions:
 
 ## Environment
 * [Jira] v8.5.5
-* [Redmine] v4.2.3
+* [Redmine] v4.2.3-5.0.1
 * [MariaDB] v10.3
 
 ### Configuration
@@ -84,7 +84,7 @@ It could cause issues and we need temporarily remove this limitation.
 In case of my docker used:
 
 ```
-docker exec -it `docker ps | grep 'alex-redmine:01' | awk '{ print $1 }'` /bin/bash
+docker exec -it `docker ps | grep 'alex-redmine:501' | awk '{ print $1 }'` /bin/bash
 
 nano /opt/bitnami/redmine/app/controllers/application_controller.rb
 "...
@@ -199,6 +199,3 @@ and so on.
 Start adjusting user groups, permissions and workflows.
 
 Good luck!
-
-
-
