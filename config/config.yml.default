@@ -144,7 +144,7 @@ TRACKER_ALIASES: {
     'area of concern': 'task',
     'good practice': 'task',
     'opportunity for improvement': 'task',
-    'audit sub-task': 'depreciated',
+    'audit sub-task': 'task',
     'usability': 'depreciated',
     'recommendation': 'feature',
     'project': 'depreciated'
