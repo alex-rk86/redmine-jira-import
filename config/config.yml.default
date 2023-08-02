@@ -10,8 +10,11 @@ JIRA_XML_FILE: '/home/alex/JiraMigration/entities.xml'
 # Jira attachment directory
 JIRA_ATTACHMENTS_DIR: '/home/alex/JiraMigration/attachments'
 
-# Result MySQL file to run post import
+# Result SQL file to run post import
 SQL_OUTPUT_FILE: '/home/alex/JiraMigration/migrate.sql'
+
+# Dialect for SQL file (currently 'mysql' and 'postgres' are supported)
+SQL_OUTPUT_FILE_DIALECT: 'mysql'
 
 # Result attachment directory
 ATTACHMENTS_OUTPUT_DIR: '/home/alex/JiraMigration/jira'
